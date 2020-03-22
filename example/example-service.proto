@@ -1,0 +1,29 @@
+syntax = "proto3";
+package main;
+
+import "google/api/annotations.proto";
+
+message ExampleRequest {}
+
+message ExampleResponse {
+  repeated Outer slice = 1;
+}
+
+message Outer {
+  string col1 = 1;
+  int64 col2 = 2;
+  Inner inner = 3;
+}
+
+message Inner {
+  bool col3 = 1;
+  int32 col4 = 2;
+}
+
+service ExampleService {
+  rpc Example(ExampleRequest) returns (ExampleResponse) {
+    option (google.api.http) = {
+      get: "/v1/example"
+    };
+  }
+}
