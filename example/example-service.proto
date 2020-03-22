@@ -17,7 +17,8 @@ message Outer {
 
 message Inner {
   bool col3 = 1;
-  int32 col4 = 2;
+  repeated string col4 = 2;
+  map<string, string> col5 = 3;
 }
 
 service ExampleService {

@@ -1,4 +1,4 @@
-# Example grpc server with gateway that uses CSVMarshaler
+# Example
 
 In order to run the example use:
 
@@ -12,7 +12,7 @@ and call the http endpoint:
 
 ```
 $ curl -H 'Content-Type: text/csv'  http://localhost:8081/v1/example
-Col1;Col2;Col3;Col4
-dreggn;42;true;42
-dreggn;42;true;42
+Col1;Col2;Col3;Col4;Col5
+dreggn;42;true;one|two;k1:v1
+dreggn;42;true;eins|zwo;k1:v1
 ```

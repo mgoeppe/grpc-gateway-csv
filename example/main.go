@@ -23,7 +23,8 @@ func (s Server) Example(context.Context, *ExampleRequest) (*ExampleResponse, err
 				Col2: 42,
 				Inner: &Inner{
 					Col3: true,
-					Col4: 42,
+					Col4: []string{"one", "two"},
+					Col5: map[string]string{"k1": "v1"},
 				},
 			},
 			{
@@ -31,7 +32,8 @@ func (s Server) Example(context.Context, *ExampleRequest) (*ExampleResponse, err
 				Col2: 42,
 				Inner: &Inner{
 					Col3: true,
-					Col4: 42,
+					Col4: []string{"eins", "zwo"},
+					Col5: map[string]string{"k1": "v1"},
 				},
 			},
 		},
