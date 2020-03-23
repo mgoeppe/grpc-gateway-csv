@@ -1,16 +1,20 @@
 package csv
 
 import (
-	"github.com/kylelemons/godebug/pretty"
 	"testing"
+
+	"github.com/kylelemons/godebug/pretty"
 )
 
 type outer struct {
-	col1  string
-	col2  string
-	s     []string    `csv:"slice"`
-	m     map[int]int `csv:"map"`
-	inner inner
+	col1       string
+	col2       string
+	s          []string      `csv:"slice"`
+	m1         map[int]int   `csv:"map1"`
+	m2         map[int]inner `csv:"map2"`
+	XXX_ignore string
+	inner      inner
+	innerSlice []inner
 }
 
 type inner struct {
@@ -26,10 +30,26 @@ func TestMarshaler_Marshal(t *testing.T) {
 			col1: "a",
 			col2: "b",
 			s:    []string{"a", "b"},
-			m:    map[int]int{1: 2, 3: 4},
+			m1:   map[int]int{1: 2},
+			m2: map[int]inner{
+				1: {
+					col3: "x",
+					col4: 7,
+				},
+			},
 			inner: inner{
 				col3: "c",
 				col4: 6,
+			},
+			innerSlice: []inner{
+				{
+					col3: "u",
+					col4: 8,
+				},
+				{
+					col3: "v",
+					col4: 9,
+				},
 			},
 		},
 		{
@@ -62,9 +82,49 @@ func TestMarshaler_Marshal(t *testing.T) {
 			want: "",
 		},
 		{
+			name: "multiple slices w/o struct",
+			v: struct {
+				a []string
+				b []string
+			}{
+				a: []string{"a", "b"},
+				b: []string{"c", "d"},
+			},
+			wantErr: true,
+		},
+		{
+			name: "multiple slices w/ struct",
+			v: struct {
+				a []inner
+				b []outer
+			}{
+				a: []inner{
+					{
+						col3: "a",
+						col4: 1,
+					},
+					{
+						col3: "b",
+						col4: 2,
+					},
+				},
+				b: []outer{
+					{
+						col1: "c",
+						col2: "d",
+					},
+					{
+						col1: "e",
+						col2: "f",
+					},
+				},
+			},
+			want: "col3;col4\na;1\nb;2\n---\ncol1;col2;slice;map1;map2;col3;col4;innerSlice\nc;d;;;;;0;\ne;f;;;;;0;\n",
+		},
+		{
 			name: "deep structure",
 			v:    v,
-			want: "col1;col2;slice;map;col3;col4\na;b;a|b;1:2|3:4;c;6\ne;f;a|b|c;;g;6\n",
+			want: "col1;col2;slice;map1;map2;col3;col4;innerSlice\na;b;a|b;1:2;1:x|7;c;6;u|8|v|9\ne;f;a|b|c;;;g;6;\n",
 		},
 	}
 	for _, tt := range tests {
@@ -80,5 +140,13 @@ func TestMarshaler_Marshal(t *testing.T) {
 				t.Errorf("CSVMarshaler.Marshal() generate unexpected results:\n%s", diff)
 			}
 		})
+	}
+}
+
+func TestMarshaler_ContentType(t *testing.T) {
+	want := "text/csv"
+	m := &Marshaler{}
+	if got := m.ContentType(); got != want {
+		t.Errorf("Marshaler.ContentType() = %v, want %v", got, want)
 	}
 }

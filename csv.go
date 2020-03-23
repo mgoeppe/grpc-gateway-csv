@@ -36,8 +36,10 @@ func (m *Marshaler) initDefaults() {
 // Marshal renders the structure in i as CSV.
 //
 // If i is a slice or a struct that contains slices each slice
-// is rendered to a CSV block. These blocks are delimited by '\n---\n'.
-// Empty slices or nil pointers are ignored.
+// is rendered to a CSV block. These top-level slices need to
+// contain structs otherwise an error is returned.
+// Each top-level slices is rendered to one block. The blocks
+// are delimited by '---\n'. Empty slices or nil pointers are ignored.
 //
 // Each csv block consists of a header (if NoHeader option is false) and
 // multiple rows delimited by m.RowDelimi. Each row is a 'flat'
@@ -48,31 +50,43 @@ func (m *Marshaler) Marshal(i interface{}) ([]byte, error) {
 	m.initDefaults()
 
 	v := reflect.ValueOf(i)
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
+	v = followPtr(v)
 
 	slices := []string{}
+	var err error
 	switch v.Kind() {
 	case reflect.Struct:
 		t := v.Type()
 		for i := 0; i < t.NumField(); i++ {
 			v := v.Field(i)
 			if v.Kind() == reflect.Slice {
-				if s := m.marshalSlice(v); s != "" {
-					slices = append(slices, s)
+				slices, err = m.marshalSliceAndAppend(slices, v)
+				if err != nil {
+					return nil, err
 				}
 			}
 		}
 		break
 	case reflect.Slice:
-		if s := m.marshalSlice(v); s != "" {
-			slices = append(slices, s)
+		slices, err = m.marshalSliceAndAppend(slices, v)
+		if err != nil {
+			return nil, err
 		}
 		break
 	}
-	return []byte(strings.Join(slices, "\n---\n")), nil
+	return []byte(strings.Join(slices, "---\n")), nil
 
+}
+
+func (m *Marshaler) marshalSliceAndAppend(slices []string, v reflect.Value) ([]string, error) {
+	s, err := m.marshalSlice(v)
+	if err != nil {
+		return nil, err
+	}
+	if s != "" {
+		return append(slices, s), nil
+	}
+	return slices, nil
 }
 
 type visit struct {
@@ -81,29 +95,32 @@ type visit struct {
 	next *visit
 }
 
-func (m *Marshaler) marshalSlice(v reflect.Value) string {
+func (m *Marshaler) marshalSlice(v reflect.Value) (string, error) {
 	if v.IsNil() || v.Len() == 0 {
-		return ""
+		return "", nil
 	}
 
 	res := ""
+	// header
+	first := followPtr(v.Index(0))
+	if first.Type().Kind() != reflect.Struct {
+		return "", fmt.Errorf("top-level slice with non struct type: %s", v.Index(0).Type().Kind())
+	}
 	if !m.NoHeader {
-		header := m.marshal(v.Index(0), true, map[uintptr]*visit{})
+		header := m.marshal(first, true, map[uintptr]*visit{})
 		res = res + fmt.Sprintf("%s%s", strings.Join(header, m.FieldDelim), m.RowDelim)
 	}
+
 	for i := 0; i < v.Len(); i++ {
 		row := m.marshal(v.Index(i), false, map[uintptr]*visit{})
 		res = res + fmt.Sprintf("%s%s", strings.Join(row, m.FieldDelim), m.RowDelim)
 	}
-	return res
+	return res, nil
 }
 
 func (m *Marshaler) marshal(v reflect.Value, header bool, visited map[uintptr]*visit) []string {
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
-
 	res := []string{}
+	v = followPtr(v)
 
 	// break recursion
 	if v.CanAddr() {
@@ -180,8 +197,7 @@ func (m *Marshaler) marshal(v reflect.Value, header bool, visited map[uintptr]*v
 
 // name evaluates field name to use when marshaling. The following order applies:
 // 1. csv tag
-// 2. json tag
-// 3. field name
+// 2. field name
 func name(f reflect.StructField) string {
 	n := f.Tag.Get("csv")
 	if n != "" {
@@ -191,7 +207,14 @@ func name(f reflect.StructField) string {
 
 }
 
-// ContentType returns the Content-Type which this marshaler is responsible for.
+func followPtr(v reflect.Value) reflect.Value {
+	if v.Kind() == reflect.Ptr {
+		return v.Elem()
+	}
+	return v
+}
+
+// ContentType returns 'text/csv'.
 func (m *Marshaler) ContentType() string {
 	return "text/csv"
 }
