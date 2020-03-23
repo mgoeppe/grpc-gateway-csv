@@ -1,4 +1,4 @@
-![](https://travis-ci.com/matoubidou/grpc-gateway-csv.svg?branch=master) [![](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/github.com/matoubidou/grpc-gateway-csv)
+![travis-ci](https://travis-ci.com/matoubidou/grpc-gateway-csv.svg?branch=master) ![codecov](https://codecov.io/gh/matoubidou/grpc-gateway-csv/branch/master/graph/badge.svg) [![](http://img.shields.io/badge/godoc-reference-5272B4.svg)](https://godoc.org/github.com/matoubidou/grpc-gateway-csv)
 
 # grpc gateway csv marshaler
 
