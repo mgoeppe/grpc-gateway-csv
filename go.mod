@@ -1,4 +1,4 @@
-module github.com/mathias-zeller/grpc-gateway-csv
+module github.com/matoubidou/grpc-gateway-csv
 
 go 1.13
 
