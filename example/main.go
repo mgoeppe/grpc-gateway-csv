@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/mathias-zeller/grpc-gateway-csv"
-	"google.golang.org/grpc"
 	"net"
 	"net/http"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	csv "github.com/matoubidou/grpc-gateway-csv"
+	"google.golang.org/grpc"
 )
 
 //go:generate protoc -I/usr/local/include -I. -I$GOPATH/src -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --go_out=plugins=grpc:. example-service.proto
