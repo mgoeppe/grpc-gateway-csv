@@ -2,9 +2,10 @@ package csv
 
 import (
 	"fmt"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"reflect"
 	"strings"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 )
 
 type Marshaler struct {
@@ -138,7 +139,8 @@ func (m *Marshaler) marshal(v reflect.Value, header bool, visited map[uintptr]*v
 	for i := 0; i < v.NumField(); i++ {
 		val := v.Field(i)
 		typ := v.Type().Field(i)
-		if strings.HasPrefix(typ.Name, "XXX_") {
+		// old proto version uses XXX_ as field name prefix for internal stuff
+		if strings.ToLower(string(typ.Name[0])) == string(typ.Name[0]) || strings.HasPrefix(typ.Name, "XXX_") {
 			continue
 		}
 
