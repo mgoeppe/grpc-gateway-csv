@@ -6,13 +6,12 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	csv "github.com/matoubidou/grpc-gateway-csv"
 	"google.golang.org/grpc"
 )
 
-//go:generate protoc -I/usr/local/include -I. -I$GOPATH/src -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --go_out=plugins=grpc:. example-service.proto
-//go:generate protoc -I/usr/local/include -I. -I$GOPATH/src -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --grpc-gateway_out=logtostderr=true:. example-service.proto
+//go:generate protoc -I . -I $HOME/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --go_out . --go_opt paths=source_relative --go-grpc_out . --grpc-gateway_out . --go-grpc_opt paths=source_relative example-service.proto
 
 type Server struct{}
 
@@ -39,6 +38,10 @@ func (s Server) Example(context.Context, *ExampleRequest) (*ExampleResponse, err
 			},
 		},
 	}, nil
+}
+
+func (s Server) mustEmbedUnimplementedExampleServiceServer() {
+
 }
 
 func main() {

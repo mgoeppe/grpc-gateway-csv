@@ -147,7 +147,7 @@ func TestMarshaler_Marshal(t *testing.T) {
 func TestMarshaler_ContentType(t *testing.T) {
 	want := "text/csv"
 	m := &Marshaler{}
-	if got := m.ContentType(); got != want {
+	if got := m.ContentType(nil); got != want {
 		t.Errorf("Marshaler.ContentType() = %v, want %v", got, want)
 	}
 }

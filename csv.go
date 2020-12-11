@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 )
 
 type Marshaler struct {
@@ -217,6 +217,6 @@ func followPtr(v reflect.Value) reflect.Value {
 }
 
 // ContentType returns 'text/csv'.
-func (m *Marshaler) ContentType() string {
+func (m *Marshaler) ContentType(v interface{}) string {
 	return "text/csv"
 }
