@@ -67,13 +67,11 @@ func (m *Marshaler) Marshal(i interface{}) ([]byte, error) {
 				}
 			}
 		}
-		break
 	case reflect.Slice:
 		slices, err = m.marshalSliceAndAppend(slices, v)
 		if err != nil {
 			return nil, err
 		}
-		break
 	}
 	return []byte(strings.Join(slices, "---\n")), nil
 

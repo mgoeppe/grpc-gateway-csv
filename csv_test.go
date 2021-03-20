@@ -7,15 +7,14 @@ import (
 )
 
 type outer struct {
-	Col1                       string
-	Col2                       string
-	S                          []string      `csv:"slice"`
-	M1                         map[int]int   `csv:"map1"`
-	M2                         map[int]inner `csv:"map2"`
-	XXX_ignore                 string
-	private_fields_are_ignored string
-	Inner                      inner
-	InnerSlice                 []inner
+	Col1       string
+	Col2       string
+	S          []string      `csv:"slice"`
+	M1         map[int]int   `csv:"map1"`
+	M2         map[int]inner `csv:"map2"`
+	XXX_ignore string
+	Inner      inner
+	InnerSlice []inner
 }
 
 type inner struct {
