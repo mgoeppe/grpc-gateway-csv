@@ -9,6 +9,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	csv "github.com/matoubidou/grpc-gateway-csv"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 //go:generate protoc -I . -I $HOME/go/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --go_out . --go_opt paths=source_relative --go-grpc_out . --grpc-gateway_out . --go-grpc_opt paths=source_relative example-service.proto
@@ -41,7 +42,6 @@ func (s Server) Example(context.Context, *ExampleRequest) (*ExampleResponse, err
 }
 
 func (s Server) mustEmbedUnimplementedExampleServiceServer() {
-
 }
 
 func main() {
@@ -52,7 +52,7 @@ func main() {
 	mux := runtime.NewServeMux(runtime.WithMarshalerOption("text/csv", &csv.Marshaler{}))
 	srv := grpc.NewServer()
 	RegisterExampleServiceServer(srv, Server{})
-	err := RegisterExampleServiceHandlerFromEndpoint(ctx, mux, ":8080", []grpc.DialOption{grpc.WithInsecure()})
+	err := RegisterExampleServiceHandlerFromEndpoint(ctx, mux, ":8080", []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())})
 	if err != nil {
 		panic(err)
 	}
