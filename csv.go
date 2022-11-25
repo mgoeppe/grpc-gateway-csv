@@ -18,6 +18,9 @@ type Marshaler struct {
 	// InnerDelim specifies the delimiter of merged values (slices / maps) within one field.
 	InnerDelim string
 
+	// used to print types (e.g. int, float, ...)
+	Printf func(format string, a ...any) string
+
 	// NoHeader suppresses to render the header
 	NoHeader bool
 }
@@ -32,6 +35,9 @@ func (m *Marshaler) initDefaults() {
 	if m.InnerDelim == "" {
 		m.InnerDelim = "|"
 	}
+	if m.Printf == nil {
+		m.Printf = fmt.Sprintf
+	}
 }
 
 // Marshal renders the structure in i as CSV.
@@ -45,8 +51,8 @@ func (m *Marshaler) initDefaults() {
 // Each csv block consists of a header (if NoHeader option is false) and
 // multiple rows delimited by m.RowDelimi. Each row is a 'flat'
 // representation of the corresponding slice elements:
-//  * struct fields are visible on top-level with own header delimited by m.FieldDelim
-//  * nested slices / maps are flatened delimited by m.InnerDelim
+//   - struct fields are visible on top-level with own header delimited by m.FieldDelim
+//   - nested slices / maps are flatened delimited by m.InnerDelim
 func (m *Marshaler) Marshal(i interface{}) ([]byte, error) {
 	m.initDefaults()
 
@@ -158,7 +164,7 @@ func (m *Marshaler) marshal(v reflect.Value, header bool, visited map[uintptr]*v
 					} else {
 						s = append(s, fmt.Sprintf("%s:%s",
 							fmt.Sprintf("%v", k),
-							fmt.Sprintf("%v", val.MapIndex(k)),
+							m.Printf("%v", val.MapIndex(k)),
 						))
 					}
 				}
@@ -173,7 +179,7 @@ func (m *Marshaler) marshal(v reflect.Value, header bool, visited map[uintptr]*v
 					if val.Index(j).Kind() == reflect.Struct {
 						s = append(s, m.marshal(val.Index(j), header, visited)...)
 					} else {
-						s = append(s, fmt.Sprintf("%v", val.Index(j)))
+						s = append(s, m.Printf("%v", val.Index(j)))
 					}
 				}
 				res = append(res, strings.Join(s, m.InnerDelim))
@@ -188,7 +194,7 @@ func (m *Marshaler) marshal(v reflect.Value, header bool, visited map[uintptr]*v
 			if header {
 				res = append(res, name(typ))
 			} else {
-				res = append(res, fmt.Sprintf("%v", val))
+				res = append(res, m.Printf("%v", val))
 			}
 		}
 	}
