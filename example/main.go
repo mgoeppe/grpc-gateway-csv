@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	csv "github.com/matoubidou/grpc-gateway-csv"
+	csv "github.com/mgoeppe/grpc-gateway-csv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

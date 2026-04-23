@@ -1,6 +1,6 @@
-module github.com/matoubidou/grpc-gateway-csv
+module github.com/mgoeppe/grpc-gateway-csv
 
-go 1.18
+go 1.23
 
 require (
 	github.com/golang/protobuf v1.5.2
