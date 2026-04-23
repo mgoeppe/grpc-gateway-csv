@@ -1,4 +1,5 @@
 [![CI](https://github.com/mgoeppe/grpc-gateway-csv/actions/workflows/ci.yml/badge.svg)](https://github.com/mgoeppe/grpc-gateway-csv/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/mgoeppe/grpc-gateway-csv/branch/main/graph/badge.svg)](https://codecov.io/gh/mgoeppe/grpc-gateway-csv)
 [![Go Reference](https://pkg.go.dev/badge/github.com/mgoeppe/grpc-gateway-csv.svg)](https://pkg.go.dev/github.com/mgoeppe/grpc-gateway-csv)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mgoeppe/grpc-gateway-csv)](https://goreportcard.com/report/github.com/mgoeppe/grpc-gateway-csv)
 [![License](https://img.shields.io/github/license/mgoeppe/grpc-gateway-csv)](LICENSE)
